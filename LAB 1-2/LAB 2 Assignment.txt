@@ -1,0 +1,301 @@
+// Example of First Contract
+pragma solidity ^0.6.10;
+
+contract MyFirstContract {
+
+    string public myString =  'Hello World!';
+}
+
+
+
+// TO DO 1
+pragma solidity ^0.6.10;
+
+contract WorkingWithVariables {
+
+    uint256 public myUint;
+
+    // Function 'setMyUint' which set 'myUint' to a new uint '_myUint'    
+    function setMyUint(uint _myUint) public {
+        myUint = _myUint;
+    }
+    
+    bool public myBool;
+    
+    // TO DO 1.1: Create a function 'setMyBool' which set 'myBool' to a new bool '_myBool'
+    
+    uint8 public myUint8;
+    
+    function increaseMyUint8() public {
+        myUint8++;
+    }
+    
+    // TO DO 1.2: Create a function 'decreaseMyUint8' so that 'myUint8' will decrease by 1 every time we call this function  
+  
+    address myAddress;
+    
+    // TO DO 1.3: Create a function 'setAddress' which set 'myAddress' to a new address '_myAddress'   
+ 
+    function getAddress() public view returns(address) {
+        return myAddress;
+    }
+    
+    function getBalance() public view returns(uint) {
+        return myAddress.balance;
+    }
+    
+    string public myString =  'Hello World!';
+    
+    function setMyString(string memory _myString) public {
+        myString = _myString;
+    }
+}
+
+
+
+// TO DO 2
+pragma solidity ^0.6.10;
+
+contract SendMoney {
+
+    // Total balance received from this smart contract
+    uint public balanceReceived;
+    
+    // Send ether (in wei) from an address
+    function sendMoney() public payable {
+        balanceReceived += msg.value;
+    }
+    
+    // Current balance of this smart contract
+    function getBalance() public view returns(uint) {
+        return address(this).balance;
+    }
+    
+    // Withdraw ether from current balance to current address
+    function withdrawMoney() public payable {
+        address payable to = msg.sender;
+        to.transfer(this.getBalance());
+    }
+    
+    // Withdraw ether from current balance to selected address
+    function withdrawMoneyTo(address payable _to) public {
+        // TO DO 2.1: Transfer current balance to selected address
+    }
+}
+
+
+
+// TO DO 3
+pragma solidity ^0.6.10;
+
+contract StartStopPauseDelete {
+
+    address owner;
+    bool public pause;
+    
+    constructor() public {
+        
+        // TO DO 3.1: We want the 'owner' of this contract is the 'msg.sender'
+
+    }
+    
+    // Send money to this contract
+    function sendMoney() public payable {
+        
+    }
+    
+    // Only owner can pause the contract
+    function setPause(bool _pause) public {
+        
+        // TO DO 3.2: Create a require function that, if the 'msg.sender' is not the 'owner', the error message shows "You are not the owner!" 
+
+        pause = _pause;
+    }
+    
+    
+    // Destroy this contract
+    function destroySmartContract(address payable _to) public {
+
+	// TO DO 3.3: Same require function with TO DO 3.2
+
+        require(!pause, "Contract currently pause!");
+        
+        // TO DO 3.4: Create a selfdestruct function that sends its funds to the selected address
+
+    }
+}
+
+
+
+// TO DO 4
+pragma solidity ^0.6.10;
+
+contract MappingStruct {
+    
+    // Create a struct 'Balance' with two variables and one mapping
+    struct Balance {
+        uint totalBalance;
+        uint numPayments;
+        mapping(uint => Payment) payments;
+    }
+    
+    // TO DO 4.1: Create a struct 'Payment'  with two uint which are 'amount' and 'timestamp'
+    
+    // TO DO 4.2: Create a public mapping called 'balanceReceived' with key type address to value type 'Balance'
+    
+    // Send money from different addresses and create seperated 'payment' in every transaction
+    function sendMoney() public payable {
+        balanceReceived[msg.sender].totalBalance += msg.value;
+        
+        Payment memory payment = Payment(msg.value, now);
+        balanceReceived[msg.sender].payments[balanceReceived[msg.sender].numPayments] = payment;
+        balanceReceived[msg.sender].numPayments++;
+    }
+    
+    // Withdraw all money from selected address
+    function withdrawAllMoney(address payable _to) public {
+        uint balanceToSend = balanceReceived[msg.sender].totalBalance;
+        balanceReceived[msg.sender].totalBalance = 0;
+        _to.transfer(balanceToSend);
+    }
+        
+    // Get total balance from all addresses
+    function getBalance() public view returns(uint) {
+        return address(this).balance;
+    }
+}
+
+
+
+// TO DO 5
+pragma solidity ^0.6.10;
+
+contract Exception {
+    
+    uint64 public balanceReceived;
+
+    // Send ether from an address
+    function sendMoney() public payable {
+        
+        // An assert function to check if the balance after adding the msg value is greater than or equal to the balance before adding the msg value
+        assert(balanceReceived + uint64(msg.value) >= balanceReceived);
+
+        balanceReceived += uint64(msg.value);
+    }
+    
+    // Withdraw ether from current balance to selected account
+    function withdrawMoneyTo(address payable _to, uint64 _amount) public {
+        
+        // TO DO 5.1 Create an assert function to check if the balance before deducting the amount is greater than or equal to the balance after deducting the amount
+
+        balanceReceived -= _amount;
+        _to.transfer(_amount);
+    }
+}
+
+
+
+// TO DO 6
+pragma solidity ^0.6.10;
+
+contract Functions {
+    
+    mapping(address => uint) public balanceReceived;
+    address payable owner;
+    
+    // Constructor function
+    constructor() public {
+        owner = msg.sender;
+    }
+    
+    // TO DO 6.1: Create a public and view function 'getOwner' which returns address, and the return value is 'owner'
+    
+    // TO DO 6.2: Create a public and pure function 'weiToEther' which uses uint _amountInWei and returns uint, and the return value is '_amountInWei / 1 ether' 
+
+    // Function to send money
+    function sendMoney() public payable {
+        assert(balanceReceived[msg.sender] + msg.value >= balanceReceived[msg.sender]);
+        balanceReceived[msg.sender] += msg.value;
+    }
+    
+    // Function to withdraw money
+    function withdrawMoney(address payable _to, uint _amount) public {
+        require(_amount <= balanceReceived[msg.sender], "You don't have enough money!");
+        assert(balanceReceived[msg.sender] >= balanceReceived[msg.sender] - _amount);
+        balanceReceived[msg.sender] -= _amount;
+        _to.transfer(_amount);
+    }
+    
+    // TO DO 6.3: Create a receive function that has function 'sendMoney' in it
+
+}
+
+
+
+// TO DO 7 Contract Owned
+pragma solidity ^0.6.10;
+
+contract Owned {
+    address owner;
+    
+    // Constructor function
+    constructor() public { 
+        owner = msg.sender;
+    }
+    
+    // TO DO 7.1: Create a modifier function 'onlyOwner' which has a require function in it. In the require function, we are going to check if msg.sender is the owner.
+
+}
+
+// TO DO 7 Contract InheritanceModifierImporting
+pragma solidity ^0.6.10;
+
+// TO DO 7.2: Import 'Owned.sol'
+
+// TO DO 7.3: Create a contract 'InheritanceModifierImporting' which has derived contract 'Owned'
+    
+    mapping(address => uint) public tokenBalance; 
+    uint tokenPrice = 1 ether;
+    
+    // Constructor function
+    constructor() public {
+        tokenBalance[owner] = 100;
+    }
+    
+    // Function to create new tokens
+    function createNewToken() public onlyOwner {
+        tokenBalance[owner]++;
+    }
+    
+    // TO DO 7.4: Create a function 'burnToken' to burn tokens with modifier from contract 'Owned'
+
+}
+
+
+
+// TO DO 8
+pragma solidity ^0.6.10; 
+contract Event {
+    
+    mapping(address => uint) public tokenBalance;
+    
+    // TO DO 8.1: Create an event which has 3 variables: _from, _to and _amount
+    
+    // Constructor function
+    constructor() public { 
+        tokenBalance[msg.sender] = 100;
+    }
+    
+    // Return function of sending tokens
+    function sendToken(address _to, uint _amount) public returns(bool) { 
+        require(tokenBalance[msg.sender] >= _amount, "Not enough tokens"); 
+        assert(tokenBalance[_to] + _amount >= tokenBalance[_to]); 
+        assert(tokenBalance[msg.sender] - _amount <= tokenBalance[msg.sender]);
+        tokenBalance[msg.sender] -= _amount; 
+        tokenBalance[_to] += _amount;
+    
+        // TO DO 8.2: emit the event with 3 right variables 
+        
+        return true;
+    }
+}
